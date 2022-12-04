@@ -1,14 +1,11 @@
 "use strict";
 
-const { utcToZonedTime, format } = require("date-fns-tz");
-const { find } = require("geo-tz");
-
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
   async up(queryInterface) {
     const arr = [];
-    for (let i = 0; i <= 1; i++) {
+    for (let i = 1; i <= 1; i++) {
       arr.push(
         ...[
           {
@@ -17,8 +14,8 @@ module.exports = {
             email: "riankhanafi851@gmail.com",
             lat: "-6.202394",
             long: "106.652710",
-            send_at: new Date(),
-            birth_date: "2022/12/03",
+            send_at: null,
+            birth_date: "2022/12/05",
           },
           {
             first_name: "Maya",
@@ -27,7 +24,7 @@ module.exports = {
             lat: "-6.202394",
             long: "106.652710",
             send_at: null,
-            birth_date: "2022/12/03",
+            birth_date: "2022/12/05",
           },
           {
             first_name: "sholeh",
@@ -36,7 +33,7 @@ module.exports = {
             lat: "51.507351",
             long: "-0.127758",
             send_at: null,
-            birth_date: "2022/12/03",
+            birth_date: "2022/12/04",
           },
           {
             first_name: "lisa",
@@ -45,7 +42,7 @@ module.exports = {
             lat: "-4.269928",
             long: "138.080353",
             send_at: null,
-            birth_date: "2022/12/03",
+            birth_date: "2022/12/02",
           },
           {
             first_name: "new",
@@ -54,7 +51,7 @@ module.exports = {
             lat: "40.730610",
             long: "-73.935242",
             send_at: null,
-            birth_date: "2022/12/04",
+            birth_date: "2022/12/01",
           },
           {
             first_name: "new1",
@@ -72,7 +69,7 @@ module.exports = {
             lat: "40.730610",
             long: "-73.935242",
             send_at: null,
-            birth_date: "2022/12/02",
+            birth_date: "2022/11/02",
           },
         ]
       );
@@ -87,5 +84,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
+    await queryInterface.bulkDelete("users", null, {});
   },
 };

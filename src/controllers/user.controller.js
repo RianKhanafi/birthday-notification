@@ -95,46 +95,43 @@ const getUser = async (req, res) => {
 };
 
 const sendEmail = async (elm) => {
-  try {
-    await fetch("https://email-service.digitalenvision.com.au/send-email", {
-      Method: "POST",
-      Headers: {
-        Accept: "application.json",
-        "Content-Type": "application/json",
-      },
-      Body: {
-        email: elm?.email,
-        message: `Hey, ${elm?.first_name} ${elm?.last_name} it's your birthday”`,
-      },
-      Cache: "default",
-    });
-    await Users.update({ send_at: new Date() }, { where: { id: elm.id } });
-
-    console.log("Sent email success");
-  } catch {
-    console.log("Sent email faild");
-  }
+  await fetch("https://email-service.digitalenvision.com.au/send-email", {
+    Method: "POST",
+    Headers: {
+      Accept: "application.json",
+      "Content-Type": "application/json",
+    },
+    Body: {
+      email: elm?.email,
+      message: `Hey, ${elm?.first_name} ${elm?.last_name} it's your birthday”`,
+    },
+    Cache: "default",
+  });
+  await Users.update({ send_at: new Date() }, { where: { id: elm.id } });
+  return "Email sent";
 };
 
 const mappingBirthday = async (usersList) => {
-  for (let i in usersList) {
-    const elm = usersList[i];
+  try {
+    const status = await Promise.all(
+      usersList.map((elm) => {
+        const date = new Date();
+        const timeZone = find(elm.lat, elm.long)[0];
+        const zonedDate = utcToZonedTime(date, timeZone);
 
-    const date = new Date();
-    const timeZone = find(elm.lat, elm.long)[0];
-    const zonedDate = utcToZonedTime(date, timeZone);
+        const pattern = "HH";
+        const output = formatByTimeZone(zonedDate, pattern, {
+          timeZone: timeZone,
+        });
 
-    const pattern = "HH";
-    const output = formatByTimeZone(zonedDate, pattern, {
-      timeZone: timeZone,
-    });
-
-    if (output === "09") {
-      // send all message every 9 am by user timeZone includes unsent message
-      sendEmail(elm);
-    } else {
-      console.log("No email sent");
-    }
+        // send all message every 9 am by user timeZone includes unsent message
+        if (output === "12") return sendEmail(elm);
+        return `will send at 09am ${timeZone}`;
+      })
+    );
+    console.log(status);
+  } catch (err) {
+    console.log(err);
   }
 };
 
@@ -164,7 +161,7 @@ const runBirthdayNotificaton = async (req, res) => {
 const cron = require("node-cron");
 const { Op } = require("sequelize");
 
-// start 10:03
+// every 1 hour
 cron.schedule("0 * * * *", function () {
   runBirthdayNotificaton();
 });
