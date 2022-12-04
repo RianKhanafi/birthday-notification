@@ -70,7 +70,6 @@ const editUser = async (req, res) => {
       data: req.body,
     });
   } catch (err) {
-    console.log(err, req.body.id);
     res.status(500).json({
       message: "Error",
       error: err,
