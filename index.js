@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
-    title: "Express API for Birthday Notification",
+    title: "API for Birthday Notification",
     version: "1.0.0",
   },
   servers: [
