@@ -10,7 +10,7 @@ const createUser = async (req, res) => {
   const userExist = await Users.findOne({ where: { email } });
 
   if (userExist) {
-    return res.status(409).json({ message: "User already exist" });
+    return res.status(409).json({ message: "Email already exist" });
   }
 
   try {
@@ -56,7 +56,7 @@ const deleteUser = async (req, res) => {
 const editUser = async (req, res) => {
   const { email, id, ...rest } = req.body;
 
-  const userExist = await Users.findOne({ where: { email } });
+  const userExist = await Users.findOne({ where: { id } });
 
   if (!userExist) {
     return res.status(409).json({ message: "User not found" });
@@ -110,7 +110,7 @@ const sendEmail = async (elm) => {
   return "Email sent";
 };
 
-const mappingBirthday = async (usersList) => {
+const mappingUserTimeZone = async (usersList) => {
   try {
     const status = await Promise.all(
       usersList.map((elm) => {
@@ -124,13 +124,13 @@ const mappingBirthday = async (usersList) => {
         });
 
         // send all message every 9 am by user timeZone includes unsent message
-        if (output === "12") return sendEmail(elm);
+        if (output === "09") return sendEmail(elm);
         return `will send at 09am ${timeZone}`;
       })
     );
-    console.log(status);
+    console.log("sent status :", status);
   } catch (err) {
-    console.log(err);
+    console.log("error :", err);
   }
 };
 
@@ -141,20 +141,27 @@ const runBirthdayNotificaton = async (req, res) => {
   const usersList = await Users?.findAll({
     where: {
       send_at: {
-        [Op.is]: null,
+        [Op.or]: [
+          {
+            [Op.lt]: format(date, "yyyy") + "-01-01 00:00:00",
+          },
+          {
+            [Op.is]: null,
+          },
+        ],
       },
       birth_date: {
         [Op.between]: [
           // ex: for a period a day
           // for check unsent email
           format(date, "yyyy-MM-dd") + " 00:00:00",
-          format(new Date(), "yyyy-MM-dd") + " 23:59:59",
+          format(new Date(), "yyyy-MM-dd") + " 00:00:00",
         ],
       },
     },
   });
 
-  mappingBirthday(usersList);
+  mappingUserTimeZone(usersList);
 };
 
 const cron = require("node-cron");
