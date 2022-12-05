@@ -3,6 +3,9 @@ const Users = db.users;
 const { utcToZonedTime, format: formatByTimeZone } = require("date-fns-tz");
 const { format } = require("date-fns");
 const { find } = require("geo-tz");
+const cron = require("node-cron");
+const { Op, Sequelize } = require("sequelize");
+const { sequelize } = require("../models");
 
 const createUser = async (req, res) => {
   const { email } = req.body;
@@ -151,11 +154,18 @@ const runBirthdayNotificaton = async (req, res) => {
         ],
       },
       birth_date: {
-        [Op.between]: [
-          // ex: for a period a day
-          // for check unsent email
-          format(date, "yyyy-MM-dd") + " 00:00:00",
-          format(new Date(), "yyyy-MM-dd") + " 00:00:00",
+        [Op.and]: [
+          Sequelize.where(
+            Sequelize.fn("DATE_FORMAT", Sequelize.col("birth_date"), "%m-%d"),
+            {
+              // ex: for a period a day
+              // for check unsent email
+              [Op.between]: [
+                format(date, "MM-dd"),
+                format(new Date(), "MM-dd"),
+              ],
+            }
+          ),
         ],
       },
     },
@@ -163,9 +173,6 @@ const runBirthdayNotificaton = async (req, res) => {
 
   mappingUserTimeZone(usersList);
 };
-
-const cron = require("node-cron");
-const { Op } = require("sequelize");
 
 // every 1 hour
 cron.schedule("0 * * * *", function () {
