@@ -80,22 +80,6 @@ const editUser = async (req, res) => {
   }
 };
 
-const getUser = async (req, res) => {
-  const usersList = await Users?.findAll({
-    where: {
-      send_at: {
-        [Op.is]: null,
-      },
-    },
-  });
-
-  return res.status(200).json({
-    success: true,
-    message: "Success update user",
-    data: usersList,
-  });
-};
-
 const sendEmail = async (elm) => {
   await fetch("https://email-service.digitalenvision.com.au/send-email", {
     Method: "POST",
@@ -179,4 +163,4 @@ cron.schedule("0 * * * *", function () {
   runBirthdayNotificaton();
 });
 
-module.exports = { deleteUser, createUser, getUser, editUser };
+module.exports = { deleteUser, createUser, editUser };
