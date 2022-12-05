@@ -2,12 +2,18 @@
 
 How to run this repository
 
-clone: https://github.com/RianKhanafi/birthday-notification.git
-install dependencies: `yarn install/npm install`
+Clone repositories: `git clone -b master https://github.com/RianKhanafi/birthday-notification.git`
 
-`npx sequelize-cli db:migrate`
+Install dependencies: `yarn install`
 
-npx sequelize-cli migration:create --name modify_users_add_new_fields
-npx sequelize-cli seed:generate --name demo-user
+Create Mysql database with name: `birthdayNotification`
 
-swager for test add, edit delete
+Migrate tables: `npx sequelize-cli db:migrate`
+
+Seed sample data `npx sequelize-cli db:seed:all`
+
+Run `yarn dev`
+
+Api Documentation
+
+Swager: http://localhost:3000/docs/#/
